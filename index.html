@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>WebGL - Simple triangle</title>
+        <title>Shader Fun with a Cube</title>
         <script src="gl-matrix.js"></script>
         <script src="index.js"></script>
         <style>
@@ -34,8 +34,8 @@ void main()
   gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);
 }
 </textarea>
-            <h3>Refresh button</h3>
-            <button onclick="do_animation=false;setTimeout(()=>{InitDemo();},100)">Click to go</button>
+            <h3>Shader Refresh</h3>
+            <button onclick="do_animation=false;setTimeout(()=>{InitDemo();},100)">Click to reload shader code</button>
         </div>
         <div class="card">
             <h3>Fragment Shader</h3>
