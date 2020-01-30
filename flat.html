@@ -2,17 +2,20 @@
     <head>
         <title>Shader Fun with a Cube</title>
         <script src="gl-matrix.js"></script>
+        <script src="box.js"></script>
         <script src="flat.js"></script>
         <style>
             body { margin: 0em; }
-            .card { display: none; min-width:30em; vertical-align: top; margin: 0em 1em 0em 0em;}
+            .card { display: inline-block; min-width:30em; vertical-align: top; margin: 0em 1em 0em 0em;}
             textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; }
         </style>
     </head>
     <body onload="InitDemo();">
+        <div class="card">
             <canvas id="game-surface" width="600" height="600">
                 Your browser does not support HTML5
             </canvas>
+        </div>
         <div class="card">
             <h3>Vertex Shader</h3>
             <textarea id="vertex-shader">
@@ -43,6 +46,7 @@ precision mediump float;
 #define PI 3.14159265
 
 varying vec3 fragColor;
+
 uniform float time;
 uniform vec2 resolution;
 
@@ -87,28 +91,17 @@ float noise2(vec2 st) {
         noise(st*pow(freq,4.)+vec2(446100.3371,5337.523))*pow(1.-alpha,4.);
 }
 
-#define outborder 0.99
-#define inborder 0.01
 
 void main() {
-    //vec2 uv = gl_FragCoord.xy / 100. ;
     vec2 uv = fragColor.xy ;
     
     vec3 col = vec3(noise2(vec2(uv.x*10.-time,uv.y*10.)) * .33);
     col += vec3(0., vec2(noise2(vec2(uv.x*5.+time,uv.y*5.)) * .33));
     col += vec3(vec2(noise2(vec2(uv.x*5.,uv.y*5.+time)) * .33),0.);
     
-    gl_FragColor = vec4(col,1.);
+    gl_FragColor = vec4(col,1.0);
 
-    if ( ((fragColor.x > outborder) || 
-           (fragColor.x < inborder) || 
-           (fragColor.y > outborder) || 
-           (fragColor.y < inborder))  ) {
-        //gl_FragColor = vec4(.0,.0,.0,1.);
-    }
 }
-
-
 </textarea>
         </div>
     </body>
