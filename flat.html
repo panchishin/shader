@@ -94,14 +94,13 @@ float noise2(vec2 st) {
 
 void main() {
     vec2 uv = fragColor.xy ;
-    
-    vec3 col = vec3(noise2(vec2(uv.x*10.-time,uv.y*10.)) * .33);
-    col += vec3(0., vec2(noise2(vec2(uv.x*5.+time,uv.y*5.)) * .33));
-    col += vec3(vec2(noise2(vec2(uv.x*5.,uv.y*5.+time)) * .33),0.);
-    
-    gl_FragColor = vec4(col,1.0);
+    float a = noise2(vec2(uv.x*10.-time,uv.y*10.));
+    float b = noise2(vec2(uv.x*5.+time,uv.y*5.));
+
+    gl_FragColor = vec4(a,0.,b,1.0);
 
 }
+
 </textarea>
         </div>
     </body>
