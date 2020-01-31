@@ -5,9 +5,9 @@
         <script src="box.js"></script>
         <script src="flat.js"></script>
         <style>
-            body { margin: 0em; }
+            body { margin: 0em; background-color: black; color: white; }
             .card { display: inline-block; min-width:30em; vertical-align: top; margin: 0em 1em 0em 0em;}
-            textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; }
+            textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; background-color: black; color: white}
         </style>
     </head>
     <body onload="InitDemo();">
@@ -97,10 +97,12 @@ void main() {
     float a = noise2(vec2(uv.x*10.-time,uv.y*10.));
     float b = noise2(vec2(uv.x*5.+time,uv.y*5.));
 
-    gl_FragColor = vec4(a,0.,b,1.0);
+vec4 pos = (gl_FragCoord - 300.)/150.;
+float dist = pow( pow(pos.x,2.) + pow(pos.y,2.),.5);
+
+    gl_FragColor = vec4(vec3(a,0.,b)*cos(dist),1.0);
 
 }
-
 </textarea>
         </div>
     </body>
