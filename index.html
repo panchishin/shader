@@ -1,114 +1,13 @@
 <html>
-    <head>
-        <title>Shader Fun with a Cube</title>
-        <script src="gl-matrix.js"></script>
-        <script src="index.js"></script>
-        <style>
-            body { margin: 0em; }
-            .card { display: inline-block; min-width:30em; vertical-align: top; margin: 0em 1em 0em 0em;}
-            textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; }
-        </style>
-    </head>
-    <body onload="InitDemo();">
-        <div class="card">
-            <canvas id="game-surface" width="600" height="600">
-                Your browser does not support HTML5
-            </canvas>
-        </div>
-        <div class="card">
-            <h3>Vertex Shader</h3>
-            <textarea id="vertex-shader">
-precision mediump float;
-
-attribute vec3 vertPosition;
-attribute vec3 vertColor;
-varying vec3 fragColor;
-uniform mat4 mWorld;
-uniform mat4 mView;
-uniform mat4 mProj;
-uniform float time;
-
-void main()
-{
-  fragColor = vertColor;
-  gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);
-}
-</textarea>
-            <h3>Shader Refresh</h3>
-            <button onclick="do_animation=false;setTimeout(()=>{InitDemo();},100)">Click to reload shader code</button>
-        </div>
-        <div class="card">
-            <h3>Fragment Shader</h3>
-            <textarea id="fragment-shader">
-precision mediump float;
-
-varying vec3 fragColor;
-uniform float time;
-
-#define PI 3.14159265
-
-vec2 unit = vec2(1.0,0.0);
-
-// 2D Random
-float random (in vec2 st) {
-    return fract(sin(dot(st.xy,vec2(12.9898,78.211))) * 43758.5453123);
-}
-
-// 2D Noise based on Morgan McGuire @morgan3d
-// https://www.shadertoy.com/view/4dS3Wd
-float noise (vec2 st) {
-    vec2 i = floor(st);
-    vec2 f = fract(st);
-
-    // Four corners in 2D of a tile
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
-
-    // Smooth Interpolation
-
-    // Cubic Hermine Curve.  Same as SmoothStep()
-    vec2 u = f*f*(3.0-2.0*f);
-    // u = smoothstep(0.,1.,f);
-
-    // Mix 4 coorners percentages
-    return mix(a, b, u.x) +
-            (c - a)* u.y * (1.0 - u.x) +
-            (d - b) * u.x * u.y;
-}
-float noise2(vec2 a) {
-    return noise(a/1.)*.5 + noise(-3.1*a)*.30 + noise(a*7.2)*.15 + noise(-17.7*a)*.05;
-}
-
-#define outborder .98
-#define inborder .02
-
-void main()
-{
-    vec2 uv = (vec2(fragColor.x , fragColor.y) - 0.5 ) ;
-    float angle = mod( atan(uv.x,uv.y) + time, 2.*PI);
-    float factor = 10.;
-    
-    gl_FragColor = vec4(0.,0.2, noise2(uv*10.),1.);
-    
-    if ( mod( pow(length(uv),.35)*PI*2.+angle/factor, PI*2./factor) < random(uv)*.3 ) {
-        gl_FragColor = vec4(vec3(0.3),1.);
-    }
-
-    if ( mod( pow(length(uv),.35)*PI*2.+angle/factor, PI*2./factor) < .1 ) {
-        float nn = noise2(uv*5.);
-        float spet = pow(nn,3.);
-        gl_FragColor = vec4(nn*0.6,spet,spet,1.0);
-    }
-    if ( (fragColor.x > outborder) || (fragColor.x < inborder) || 
-           (fragColor.y > outborder) || (fragColor.y < inborder) ) {
-        gl_FragColor = vec4(1.,1.,1.,1.);
-    }
-}
-
-
-</textarea>
-        </div>
-    </body>
+<body>
+    <h1>Cubes</h1>
+    <ul>
+        <li><a href='swirl.html'>Swirl</a></li>
+        <li><a href='flat.html'>Clouds</a></li>
+    </ul>
+    <h1>Threejs</h1>
+    <ul>
+        <li><a href='squares.html'>Squares</a></li>
+    </ul>
+</body>
 </html>

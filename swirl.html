@@ -5,9 +5,9 @@
         <script src="box.js"></script>
         <script src="cube.js"></script>
         <style>
-            body { margin: 0em; background-color: black; color: white; }
+            body { margin: 0em; background-color: black; }
             .card { display: inline-block; min-width:30em; vertical-align: top; margin: 0em 1em 0em 0em;}
-            textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; background-color: black; color: white}
+            textarea { width: 40em; height:40em; font-family: monospace; font-size: 1em; }
         </style>
     </head>
     <body onload="InitDemo();">
@@ -43,12 +43,10 @@ void main()
             <textarea id="fragment-shader">
 precision mediump float;
 
-#define PI 3.14159265
-
 varying vec3 fragColor;
-
 uniform float time;
-uniform vec2 resolution;
+
+#define PI 3.14159265
 
 vec2 unit = vec2(1.0,0.0);
 
@@ -57,7 +55,8 @@ float random (in vec2 st) {
     return fract(sin(dot(st.xy,vec2(12.9898,78.211))) * 43758.5453123);
 }
 
-
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
 float noise (vec2 st) {
     vec2 i = floor(st);
     vec2 f = fract(st);
@@ -76,33 +75,40 @@ float noise (vec2 st) {
 
     // Mix 4 coorners percentages
     return mix(a, b, u.x) +
-              (c - a)* u.y * (1.0 - u.x) +
-              (d - b) * u.x * u.y;
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+float noise2(vec2 a) {
+    return noise(a/1.)*.5 + noise(-3.1*a)*.30 + noise(a*7.2)*.15 + noise(-17.7*a)*.05;
 }
 
-float freq = 1.3;
-float alpha = .6;
+#define outborder .98
+#define inborder .02
 
-float noise2(vec2 st) {
-    return noise(st)*alpha + 
-        noise(st*pow(freq,2.)+vec2(100.71,537.84))*pow(1.-alpha,1.)*alpha + 
-        noise(st*pow(freq,3.)-vec2(830.43,537.27))*pow(1.-alpha,2.)*alpha + 
-        noise(st*pow(freq,3.)-vec2(133250.43,4737.21))*pow(1.-alpha,3.)*alpha + 
-        noise(st*pow(freq,4.)+vec2(446100.3371,5337.523))*pow(1.-alpha,4.);
+void main()
+{
+    vec2 uv = (vec2(fragColor.x , fragColor.y) - 0.5 ) ;
+    float angle = mod( atan(uv.x,uv.y) + time, 2.*PI);
+    float factor = 10.;
+    
+    gl_FragColor = vec4(0.,0.2, noise2(uv*10.),1.);
+    
+    if ( mod( pow(length(uv),.35)*PI*2.+angle/factor, PI*2./factor) < random(uv)*.3 ) {
+        gl_FragColor = vec4(vec3(0.3),1.);
+    }
+
+    if ( mod( pow(length(uv),.35)*PI*2.+angle/factor, PI*2./factor) < .1 ) {
+        float nn = noise2(uv*5.);
+        float spet = pow(nn,3.);
+        gl_FragColor = vec4(nn*0.6,spet,spet,1.0);
+    }
+    if ( (fragColor.x > outborder) || (fragColor.x < inborder) || 
+           (fragColor.y > outborder) || (fragColor.y < inborder) ) {
+        gl_FragColor = vec4(1.,1.,1.,1.);
+    }
 }
 
 
-void main() {
-    vec2 uv = fragColor.xy ;
-    float a = noise2(vec2(uv.x*10.-time/10.,uv.y*10.));
-    float b = noise2(vec2(uv.x*5.+time/10.,uv.y*5.));
-
-vec4 pos = (gl_FragCoord - 300.)/150.;
-float dist = pow( pow(pos.x,2.) + pow(pos.y,2.),.5);
-
-    gl_FragColor = vec4(vec3(a,0.,b)*cos(dist),1.0);
-
-}
 </textarea>
         </div>
     </body>
