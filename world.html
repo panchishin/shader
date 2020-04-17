@@ -1,0 +1,156 @@
+<html>
+<head><style>body {margin: 0;} .viewport {height: 100%; width: 100%;}</style></head>
+<body><div class='viewport' ></div></body>
+
+<script type='module'>
+
+import * as THREE from './three.module.js'
+
+function directionalLight() {
+    var light = new THREE.DirectionalLight( 0x77ffff, 0.5 );
+    light.position.set(3,10,3);
+    light.castShadow = true;
+
+    //Set up shadow properties for the light
+    light.shadow.mapSize.width = 2*1024;
+    light.shadow.mapSize.height = 2*1024;
+    light.shadow.camera.near = 0.5;
+    light.shadow.camera.far = 5000;
+
+    const d = 10;
+    light.shadow.camera.left = - d;
+    light.shadow.camera.right = d;
+    light.shadow.camera.top = d;
+    light.shadow.camera.bottom = - d;
+
+    return light
+}
+
+function ambientLight() {
+    return new THREE.AmbientLight( 0x403030 );
+}
+
+
+class View {
+    constructor (element = null) {
+        this._camera = null;
+        this._scene = null;
+        this._renderer = null;
+        this._element = element;
+        this._lights = [];
+        this._height = element.offsetHeight;
+        this._width = element.offsetWidth;
+    }
+
+    addLight(light) {
+        this._lights.push(light)
+        this.scene().add(light)
+    }
+
+    camera() {
+        if (this._camera == null && this._element != null) {
+            this._camera = new THREE.PerspectiveCamera( 70, 
+                this._width / this._height, 
+                0.01, 
+                1000 );
+            this._camera.position.set(0,5,7);
+            this._camera.rotation.x = -.5;
+        }
+        return this._camera
+    }
+
+    scene() {
+        if (this._scene == null) {
+            this._scene = new THREE.Scene();
+        }
+        return this._scene;
+    }
+
+    renderer() {
+        if (this._renderer == null && this._element != null) {
+            this._renderer = new THREE.WebGLRenderer( { antialias: true } );
+            this._renderer.shadowMap.enabled = true;
+            this._renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+            this._renderer.setSize( this._width, this._height );
+        }
+        return this._renderer
+    }
+
+    render() {
+        this.renderer().render( this.scene(), this.camera() );
+    }
+
+}
+
+var viewport;
+var view;
+
+
+let geometry = new THREE.BoxGeometry( 1, 1, 1 );
+let material = new THREE.MeshStandardMaterial( { color: 0xffffff } );
+
+class Thing {
+    constructor(x,y,z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        this.mesh = new THREE.Mesh( geometry, material );
+        view.scene().add( this.mesh );
+        this.mesh.position.set(x,y,z);
+        this.mesh.castShadow = true;
+    }
+
+    update() {
+        this.mesh.position.set(
+            this.x,
+            this.y + Math.cos(performance.now() / 250 + this.x/4 + this.z/4) / 3,
+            this.z)
+    }
+}
+
+function land() {
+    let geometry = new THREE.BoxGeometry( 15, 1, 15 );
+    let material = new THREE.MeshStandardMaterial( { color: 0x2194CE } );
+    let mesh = new THREE.Mesh( geometry, material );
+
+    mesh.position.y += -1.5;
+    mesh.position.z = -6;
+    mesh.receiveShadow = true;
+
+    return mesh    
+}
+
+var things = [];
+
+function init() {
+    viewport = document.getElementsByClassName('viewport')[0];
+    console.log(viewport)
+    view = new View(viewport);
+
+    view.addLight(directionalLight())
+    view.addLight(ambientLight())
+
+    for(let x = -5; x <=5; x+= 2) for(let z = -10; z <=0; z+= 2) {
+        things.push(new Thing(x,0,z))
+    }
+    view.scene().add( land() );
+
+    viewport.appendChild( view.renderer().domElement );
+    view.render();
+
+    animate()
+}
+
+function animate() {
+    requestAnimationFrame( animate );
+    things.forEach((thing) => {thing.update()})
+    view.render();
+}
+
+window.onload = function() {
+    init();
+}
+
+</script>
+</html>
