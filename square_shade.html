@@ -7,16 +7,17 @@
 </head>
 <body>
 <script id="vertexShader" type="x-shader/x-vertex">
-varying vec3 vUv;
+
+varying vec2 vUv;
 void main()	{
-	vUv = position;
+	vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);;
 }
 </script>
 <script id="fragmentShader" type="x-shader/x-fragment">
 #define PI 3.14159265
 
-varying vec3 vUv;
+varying vec2 vUv;
 uniform float time;
 vec2 unit = vec2(1.0,0.0);
 
@@ -61,9 +62,8 @@ float noise2(vec2 st) {
 
 
 void main() {
-	vec3 uv = vUv.xyz;
-    float a = noise2(vec2(uv.x*10.-time/1000.,uv.y*10.));
-    float b = noise2(vec2(uv.x*5.+time/1000.,uv.y*5.));
+    float a = noise2(vec2(vUv.x*10.-time/1000.,vUv.y*10.));
+    float b = noise2(vec2(vUv.x*5.+time/1000.,vUv.y*5.));
 
 vec4 pos = (gl_FragCoord - 300.)/150.;
 float dist = 1.; //pow( pow(pos.x,2.) + pow(pos.y,2.),.5);
@@ -74,9 +74,9 @@ gl_FragColor = vec4(vec3(a,0.,b)*cos(dist),1.0);
 </script>
 <script type="module">
 
-import * as THREE from '../build/three.module.js';
+import * as THREE from './three.module.js';
 
-var camera, scene, renderer, mesh;
+var camera, scene, renderer, mesh1, mesh2;
 
 var uniforms = { "time": { value: .0 } };
 
@@ -106,15 +106,15 @@ function init() {
 		fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 	} );
 
-	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-	mesh.position.set(-1,0,-4)
+	mesh1 = new THREE.Mesh( geometry, material );
+	scene.add( mesh1 );
+	mesh1.position.set(-1,0,-4)
 
 	geometry = new THREE.BoxGeometry( 1,1,1 );
 
-	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-	mesh.position.set(1,0,-5)
+	mesh2 = new THREE.Mesh( geometry, material );
+	scene.add( mesh2 );
+	mesh2.position.set(1,0,-5)
 
 
 	renderer = new THREE.WebGLRenderer();
@@ -127,7 +127,9 @@ function animate( timestamp ) {
 	requestAnimationFrame( animate );
 	uniforms[ "time" ].value = timestamp ;
 	renderer.render( scene, camera );
-	mesh.position.set(1+Math.cos(timestamp/1000)*.5,0,-5+Math.sin(timestamp/1000)*2);
+
+    mesh1.rotation.y = 1.5+Math.cos(timestamp/1000)*.5;
+    mesh2.position.set(1.5+Math.cos(timestamp/1000)*.5,0,-5+Math.sin(timestamp/1000)*2);
 
 }
 
