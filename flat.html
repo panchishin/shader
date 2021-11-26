@@ -85,10 +85,10 @@ float alpha = .6;
 
 float noise2(vec2 st) {
     return noise(st)*alpha + 
-        noise(st*pow(freq,2.)+vec2(100.71,537.84))*pow(1.-alpha,1.)*alpha + 
-        noise(st*pow(freq,3.)-vec2(830.43,537.27))*pow(1.-alpha,2.)*alpha + 
-        noise(st*pow(freq,3.)-vec2(133250.43,4737.21))*pow(1.-alpha,3.)*alpha + 
-        noise(st*pow(freq,4.)+vec2(446100.3371,5337.523))*pow(1.-alpha,4.);
+        noise(st*pow(freq,2.)+vec2(-11.0071,15.3784))*pow(1.-alpha,1.)*alpha + 
+        noise(st*pow(freq,3.)-vec2(-8.3043,-5.3727))*pow(1.-alpha,2.)*alpha + 
+        noise(st*pow(freq,3.)-vec2(13.325043,47.3721))*pow(1.-alpha,3.)*alpha + 
+        noise(st*pow(freq,4.)+vec2(44.61003371,53.37523))*pow(1.-alpha,4.);
 }
 
 
